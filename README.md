@@ -1,2 +1,2 @@
-# Seiyuu-Corner
+# Seiyuu Corner
 SC Assignments Tracker
