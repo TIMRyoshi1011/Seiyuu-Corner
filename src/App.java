@@ -6,6 +6,8 @@ import Controller.*;
 public class App {
     public static void main(String[] args) {
         SQLConnect sqlConnect = new SQLConnect();
+        sqlConnect.enterPassword();
+        sqlConnect.createDatabase();
         sqlConnect.Connect();
 
         View view = new View();
