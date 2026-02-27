@@ -399,6 +399,7 @@ public class Model {
             JOptionPane.showMessageDialog(null, "Assignment added successfully!");
 
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Seiyuu is already assigned");
             e.printStackTrace();
         }
     }
@@ -524,6 +525,7 @@ public class Model {
             JOptionPane.showMessageDialog(null, "Seasonal assignment created successfully!");
 
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Staff is already assigned");
             e.printStackTrace();
         }
     }
