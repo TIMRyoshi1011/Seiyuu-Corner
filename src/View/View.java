@@ -32,8 +32,10 @@ public class View extends JFrame {
 
     private String m1;
     private String m2;
+    private String s;
     private JLabel month1 = new JLabel(m1);
     private JLabel month2 = new JLabel(m2);
+    private JLabel season = new JLabel(s);
     private JButton viewSeasonalSched;
     private JButton addSeasonalSched;
     private JButton removeSeasonalSched;
@@ -390,6 +392,55 @@ public class View extends JFrame {
         centerPanel.repaint();
     }
 
+    public void displayCatalogTable(String query) {
+        Connection conn = sqlConnect.getConnection();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            // Get metadata for column names
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnCount = rsmd.getColumnCount();
+            String[] columnNames = new String[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                columnNames[i - 1] = rsmd.getColumnName(i);
+            }
+
+            // Read rows into DefaultTableModel
+            DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+        
+            while (rs.next()) {
+                Object[] rowData = new Object[columnCount];
+                for (int i = 1; i <= columnCount; i++) {
+                    rowData[i - 1] = rs.getObject(i);
+                }
+                model.addRow(rowData);
+            }
+
+            // Display in JTable
+            JTable table = new JTable(model);
+            JScrollPane scrollPane = new JScrollPane(table);
+
+            centerPanel.removeAll();
+            season.setFont(new Font("Segoe UI", Font.PLAIN, 48));
+            centerPanel.add(season);
+            centerPanel.add(scrollPane, BorderLayout.CENTER);
+            centerPanel.revalidate();
+            centerPanel.repaint();
+
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setMonth1(String month) {
         this.m1 = month;
         month1.setText(month);
@@ -400,11 +451,20 @@ public class View extends JFrame {
         month2.setText(month);
     }
 
+    public void setSeason(String aSeason) {
+        this.s = aSeason;
+        season.setText(aSeason);
+    }
+
     public void deleteMonth1(){
         month1.setText(null);
     }
 
     public void deleteMonth2(){
         month2.setText(null);
+    }
+
+    public void deleteSeason() {
+        season.setText(null);
     }
 }

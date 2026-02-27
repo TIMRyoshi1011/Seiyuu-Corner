@@ -425,22 +425,14 @@ public class Model {
         }
     }
 
-    public void deleteAssignmentInDB(int staffId, int seiyuuId) {
-        String query = "DELETE FROM staff_assignment WHERE staff_id = ? AND seiyuu_id = ?";
+    public void deleteAssignmentInDB() {
+        String query = "DELETE FROM staff_assignment";
 
         try (Connection conn = sqlConnect.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(query)) {
+            Statement stmt = conn.createStatement()) {
 
-            pstmt.setInt(1, staffId);
-            pstmt.setInt(2, seiyuuId);
-
-            int rowsDeleted = pstmt.executeUpdate();
-
-            if (rowsDeleted > 0) {
-                JOptionPane.showMessageDialog(null, "Assignment deleted successfully.");
-            } else {
-                JOptionPane.showMessageDialog(null, "Assignment deleted unsuccessfully.");
-            }
+            stmt.executeUpdate(query);
+            JOptionPane.showMessageDialog(null, "Birthday Assignments has been reset");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -569,7 +561,7 @@ public class Model {
             Statement stmt = conn.createStatement()) {
 
             stmt.executeUpdate(sql);
-            JOptionPane.showMessageDialog(null, "Sesonal has been reset");
+            JOptionPane.showMessageDialog(null, "Sesonals has been reset");
 
         } catch (SQLException e) {
             e.printStackTrace();

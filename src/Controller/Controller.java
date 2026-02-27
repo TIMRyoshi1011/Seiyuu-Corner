@@ -452,41 +452,6 @@ public class Controller implements ActionListener {
         updateAssignmentFrame.setVisible(true);
     }
 
-    private void deleteAssignmentinSQL() {
-        JFrame deleteAssignmentFrame = new JFrame("Delete Assignment");
-        deleteAssignmentFrame.setSize(450, 120);
-        deleteAssignmentFrame.setLayout(new FlowLayout());
-        deleteAssignmentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        deleteAssignmentFrame.setResizable(false);
-
-        String[] seiyuu = model.getSeiyuuNamesArray();
-
-        JLabel label1 = new JLabel("Delete Assignment of ");
-        JComboBox<String> staffL = new JComboBox<>(model.getStaffNamesArray());
-        JLabel label2 = new JLabel("to ");
-        JComboBox<String> seiyuuL = new JComboBox<>(seiyuu);
-        JButton deleteButton = new JButton("Delete");
-
-        deleteButton.addActionListener(e -> {
-
-            deleteAssignmentFrame.dispose();
-
-            int staffIndex = staffL.getSelectedIndex();
-            int seiyuuIndex = seiyuuL.getSelectedIndex();
-            model.deleteAssignmentInDB(staffIndex + 1, seiyuuIndex + 1);
-            
-        });
-
-        deleteAssignmentFrame.add(label1);
-        deleteAssignmentFrame.add(staffL);
-        deleteAssignmentFrame.add(label2);
-        deleteAssignmentFrame.add(seiyuuL);
-        deleteAssignmentFrame.add(deleteButton);
-
-        deleteAssignmentFrame.setLocationRelativeTo(null);
-        deleteAssignmentFrame.setVisible(true);
-    }
-
     private void viewSeasonal() {
         String query1 = "SELECT * FROM seasonal_calendar";
         String query2 = "SELECT * FROM seasonal_calendar_2";
@@ -711,36 +676,93 @@ public class Controller implements ActionListener {
     private void viewCatalogs() {
         String query = "SELECT CONCAT(s.FIRST_NAME, ' ', s.LAST_NAME) AS Assigned, " +
                         "ca.ANIME FROM catalog_assignment ca JOIN staff s ON ca.STAFF_ID = s.STAFF_ID;";
-        view.displayTable(query);
+        view.displayCatalogTable(query);
     }
 
     private void addCatalogs() {
-        JFrame addCatalogFrame = new JFrame("Add Catalog");
-        addCatalogFrame.setSize(420, 110);
+        JFrame addCatalogFrame = new JFrame("Add Catalogs");
+        addCatalogFrame.setSize(420, 80);
         addCatalogFrame.setLayout(new FlowLayout());
         addCatalogFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         addCatalogFrame.setResizable(false);
 
-        JLabel label1 = new JLabel("Assign: ");
-        JComboBox<String> staffL = new JComboBox<>(model.getStaffNamesArray());
-        JLabel label2 = new JLabel("in ");
-        JTextField anime = new JTextField(20);
-        JButton assign = new JButton("Assign");
+        JLabel label1 = new JLabel("Choose: ");
+        JButton seasonButton = new JButton("Display Season");
+        JButton assignButton = new JButton("Assign Catalog");
 
-        assign.addActionListener(e -> {
+        seasonButton.addActionListener(e -> {
             addCatalogFrame.dispose();
 
-            int staffId = staffL.getSelectedIndex();
-            String animeName = anime.getText();
+            JFrame chooseSeasonFrame = new JFrame("Display Season");
+            chooseSeasonFrame.setSize(250, 160);
+            chooseSeasonFrame.setLayout(new FlowLayout());
+            chooseSeasonFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            chooseSeasonFrame.setResizable(false);
 
-            model.addCatalogAssignment(animeName, staffId + 1);
+            JLabel label4 = new JLabel("Choose Season: ");
+            String[] seasons = {"Winter", "Spring", "Summer", "Fall"};
+            JComboBox<String> season = new JComboBox<>(seasons);
+            JLabel label5 = new JLabel("Enter Year");
+            JTextField year = new JTextField(20);
+            JButton place = new JButton("Place Season");
+            
+            place.addActionListener(f -> {
+                chooseSeasonFrame.dispose();
+
+                String placeSeason = (String) season.getSelectedItem();
+                String yearNow = year.getText();
+                String animeSeason = placeSeason + " " + yearNow;
+                view.setSeason(animeSeason);
+            });
+
+            chooseSeasonFrame.add(label4);
+            chooseSeasonFrame.add(season);
+            chooseSeasonFrame.add(label5);
+            chooseSeasonFrame.add(year);
+            chooseSeasonFrame.add(place);
+
+            chooseSeasonFrame.setLocationRelativeTo(null);
+            chooseSeasonFrame.setVisible(true);
+        });
+
+        assignButton.addActionListener(e -> {
+            addCatalogFrame.dispose();
+
+            JFrame addCatalogAFrame = new JFrame("Add Catalog");
+            addCatalogAFrame.setSize(420, 110);
+            addCatalogAFrame.setLayout(new FlowLayout());
+            addCatalogAFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            addCatalogAFrame.setResizable(false);
+
+            JLabel label2 = new JLabel("Assign: ");
+            JComboBox<String> staffL = new JComboBox<>(model.getStaffNamesArray());
+            JLabel label3 = new JLabel("in ");
+            JTextField anime = new JTextField(20);
+            JButton assign = new JButton("Assign");
+
+            assign.addActionListener(f -> {
+                addCatalogAFrame.dispose();
+
+                int staffId = staffL.getSelectedIndex();
+                String animeName = anime.getText();
+
+                model.addCatalogAssignment(animeName, staffId + 1);
+            });
+
+            addCatalogAFrame.add(label2);
+            addCatalogAFrame.add(staffL);
+            addCatalogAFrame.add(label3);
+            addCatalogAFrame.add(anime);
+            addCatalogAFrame.add(assign);
+
+            addCatalogAFrame.setLocationRelativeTo(null);
+            addCatalogAFrame.setVisible(true);
         });
 
         addCatalogFrame.add(label1);
-        addCatalogFrame.add(staffL);
-        addCatalogFrame.add(label2);
-        addCatalogFrame.add(anime);
-        addCatalogFrame.add(assign);
+        addCatalogFrame.add(seasonButton);
+        addCatalogFrame.add(assignButton);
+
 
         addCatalogFrame.setLocationRelativeTo(null);
         addCatalogFrame.setVisible(true);
@@ -789,7 +811,7 @@ public class Controller implements ActionListener {
             updateAssignmentinSQL();
         }
         else if (e.getActionCommand().equals("Delete Bday Assignment")) {
-            deleteAssignmentinSQL();
+            model.deleteAssignmentInDB();
         }
         else if (e.getActionCommand().equals("View Seasonal Schedule")) {
             viewSeasonal();
@@ -813,6 +835,7 @@ public class Controller implements ActionListener {
         }
         else if (e.getActionCommand().equals("Delete Catalog Assignments")) {
             model.deleteCatalogs();
+            view.deleteSeason();
             view.resetView();
         }
     }
